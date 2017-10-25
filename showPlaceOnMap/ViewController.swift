@@ -8,7 +8,8 @@
 
 import UIKit
 import MapKit
-class ViewController: UIViewController , UISearchBarDelegate {
+import CoreLocation
+class ViewController: UIViewController , UISearchBarDelegate, CLLocationManagerDelegate {
 
 
     @IBOutlet weak var mapView: MKMapView!
@@ -75,11 +76,32 @@ class ViewController: UIViewController , UISearchBarDelegate {
         
     }
 
+    // CL manager
     
+    let manager = CLLocationManager()
+    
+    
+    // delegate function calld every time when user changes locations
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[0] // [0] means the most recent position of our user
+        let span: MKCoordinateSpan = MKCoordinateSpanMake(0.01, 0.01)
+        let myLocation: CLLocationCoordinate2D = CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude)
+        let region: MKCoordinateRegion = MKCoordinateRegionMake(myLocation, span)
+        mapView.setRegion(region, animated: true)
+        
+        //show user location as a blue dot
+        
+        self.mapView.showsUserLocation = true
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        // coreLocation Staf
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.requestWhenInUseAuthorization()
+        manager.startUpdatingLocation()
     }
 
 
